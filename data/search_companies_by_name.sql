@@ -1,0 +1,1 @@
+SELECT DISTINCT company_group_id FROM company WHERE MATCH(name) AGAINST('증권' IN BOOLEAN MODE);
