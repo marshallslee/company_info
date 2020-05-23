@@ -16,18 +16,18 @@ $curl -X POST localhost:5000/language --header "Content-Type: application/json" 
 ```
 
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
-```json
+```
+HTTP 200
 {
-  "response_code": 200,
-  "message": ""
+  "message": "OK"
 }
 ```
 
 중복된 데이터를 추가하려다 실패하는 경우의 응답은 다음과 같다.
-```json
+```
+HTTP 400
 {
-  "response_code": 500,
-  "message": "Duplicate entry"
+  "message": "Failure 1062 (23000): Duplicate entry 'en' for key 'code_UNIQUE'"
 }
 ```
 
@@ -41,19 +41,26 @@ name: 회사 그룹명.
 }
 ```
 
+커맨드라인으로는 다음과 같이 호출 가능하다.
+```
+$curl -X POST localhost:5000/company-group --header "Content-Type: application/json" --data '{"name": "원티드랩"}'
+```
+
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
-```json
+```
+HTTP 200
+
 {
-  "response_code": 200,
   "message": ""
 }
 ```
 
 중복된 데이터를 추가하려다 실패하는 경우의 응답은 다음과 같다.
-```json
+```
+HTTP 400
+
 {
-  "response_code": 500,
-  "message": "Duplicate entry"
+  "message": "Failure: 1062 (23000): Duplicate entry '' for key 'name_UNIQUE'"
 }
 ```
 
@@ -74,16 +81,16 @@ tag_group_name: 태그 그룹명.
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
 ```json
 {
-  "response_code": 200,
-  "message": ""
+  "message": "OK"
 }
 ```
 
 중복된 데이터를 추가하려다 실패하는 경우의 응답은 다음과 같다.
-```json
+```
+HTTP 400
+
 {
-  "response_code": 500,
-  "message": "Duplicate entry"
+  "message": "Failure: 1062 (23000): Duplicate entry '' for key 'name_UNIQUE'"
 }
 ```
 
@@ -102,16 +109,16 @@ name: 태그 그룹명.
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
 ```json
 {
-  "response_code": 200,
-  "message": ""
+  "message": "OK"
 }
 ```
 
 중복된 데이터를 추가하려다 실패하는 경우의 응답은 다음과 같다.
-```json
+```
+HTTP 400
+
 {
-  "response_code": 500,
-  "message": "Duplicate entry"
+  "message": "Failure: 1062 (23000): Duplicate entry '' for key 'name_UNIQUE'"
 }
 ```
 
@@ -130,36 +137,71 @@ tag_group_id: 태그 그룹명
 ```
 
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
-```json
+```
+HTTP 200
 {
-  "response_code": 200,
-  "message": ""
+  "message": "OK"
 }
 ```
 
 중복된 데이터를 추가하려다 실패하는 경우의 응답은 다음과 같다.
-```json
+```
+HTTP 400
+
 {
-  "response_code": 500,
-  "message": "Duplicate entry"
+  "message": "Failure message"
 }
 ```
 
 #### 6. `/company`
+##### 1) `POST` 메소드. 회사 추가
+```
+name: 회사명.
+company_group_id: 회사 그룹
+language_code: 언어 코드 (en, kr, jp, cn, fr 등등)
+
+{
+  "name": "startup",
+  "company_group_name": "",
+  "language_code": "en",
+}
+```
+
+성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
+```
+HTTP 200
+{
+  "message": "OK"
+}
+```
+
+중복된 데이터를 추가하려다 실패하는 경우의 응답은 다음과 같다.
+```
+HTTP 400
+
+{
+  "message": "Failure message"
+}
+```
 
 #### 7. `/search`
 `GET` 메소드. 뒤에 붙는 파라미터 목록은 다음과 같다.
-* `type`: 검색 타입. 회사명 검색인지 혹은 태그 기반 검색인지 정하는 부분.
-* `query`: 검색어
+* `query_type`: 검색 타입. 회사명 검색인지 혹은 태그 기반 검색인지 정하는 부분.
+* `keyword`: 검색어
 
-예제 요청은 다음과 같다.
+요청 예시는 다음과 같다.
 ```
-GET /search?type=tag&query=스타트업
+1. 태그 검색
+GET /search?query_type=tag&keyword=tag_1
+
+2. 회사명 검색
+GET /search?query_type=company&keyword=株式会社
 ```
 
 정상적인 요청이 이루어지면 다음과 같이 리턴한다.
 ```
-HTTP/1.1 200 OK
+200 OK
+
 {
     "result": [
         {
@@ -174,6 +216,7 @@ HTTP/1.1 200 OK
     ]
 }
 ```
+
 
 검색 및 결과 리턴 순서도는 각각 다음 참조.
 * [회사명 검색](../../images/flowcharts/search_by_company.png)

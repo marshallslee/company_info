@@ -1,16 +1,19 @@
 from flask import Flask, request, json, jsonify
 from mysql import connector
-from sqlalchemy import create_engine
-from sqlalchemy.dialects import mysql
+from sqlalchemy import create_engine, func, distinct
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from config.config import DB_URI
-from db.model import Language, CompanyGroup, TagGroup, CompanyTag
+from db.model import Language, CompanyGroup, TagGroup, CompanyTag, Company, Tag
+
 
 app = Flask(__name__)
 engine = create_engine(DB_URI)
 _session = sessionmaker(bind=engine)
 session = _session()
+
+# UTF-8 서포트
+app.config['JSON_AS_ASCII'] = False
 
 
 @app.route('/')
@@ -51,17 +54,19 @@ def add_new_company_group():
         data = request.get_json()
         group_name = data['name']
         company_group = CompanyGroup(group_name)
+
         try:
             session.add(company_group)
             session.commit()
-            response['result'] = 'OK'
+            response['message'] = 'OK'
 
         except (
             connector.Error,
             IntegrityError
         ) as e:
             session.rollback()
-            response['result'] = 'Failure: {}'.format(e.__cause__)
+            response['message'] = 'Failure: {}'.format(e.__cause__)
+            return jsonify(response), 400
 
         finally:
             session.close()
@@ -115,8 +120,11 @@ def add_tag_group_to_company_group():
             connector.Error,
             IntegrityError
         ) as e:
-            response['result'] = "Failed to process the request. {}".format(e.msg)
-        return jsonify(response)
+            response['message'] = e.__cause__
+            return jsonify(response), 400
+
+        json_response = json.dumps(response)
+        return json_response
 
 
 @app.route('/tag-group', methods=['POST'])
@@ -190,10 +198,39 @@ def add_new_company():
 
 @app.route('/search', methods=['GET'])
 def search():
-    query_type = request.args.get('type')
+    response = {}
+    query_type = request.args.get('query_type')
     keyword = request.args.get('keyword')
 
-    return
+    # 회사명으로 검색시
+    if query_type == 'company':
+        res = []
+
+        company_group_ids = session.query(Company.company_group_id).filter(Company.name.match(keyword)).distinct().all()
+
+        for company_group_id in company_group_ids:
+            res.append(company_group_id)
+
+        response['message'] = res
+
+    elif query_type == 'tag':
+        company_groups = session.\
+            query(CompanyTag).\
+            filter(CompanyTag.tag_group_id ==
+                   session.
+                   query(Tag.tag_group_id).
+                   filter(Tag.name ==
+                          keyword)).\
+            all()
+
+        res = []
+        for company_group in company_groups:
+            res.append(company_group.company_group_id)
+
+        response['message'] = res
+
+    json_response = json.dumps(response)
+    return json_response
 
 
 if __name__ == '__main__':
