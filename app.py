@@ -1,6 +1,6 @@
 from flask import Flask, request, json, jsonify
 from mysql import connector
-from sqlalchemy import create_engine, func, distinct
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from config.config import DB_URI
@@ -198,24 +198,26 @@ def add_new_company():
 
 @app.route('/search', methods=['GET'])
 def search():
+    companies_list = []
+    company_group_ids = []
     response = {}
+
     query_type = request.args.get('query_type')
     keyword = request.args.get('keyword')
 
     # 회사명으로 검색시
     if query_type == 'company':
-        res = []
+        company_group_ids = session.\
+            query(Company.company_group_id).\
+            filter(Company.name.
+                   match(keyword)).\
+            distinct().\
+            all()
 
-        company_group_ids = session.query(Company.company_group_id).filter(Company.name.match(keyword)).distinct().all()
-
-        for company_group_id in company_group_ids:
-            res.append(company_group_id)
-
-        response['message'] = res
-
+    # 태그명으로 검색시
     elif query_type == 'tag':
-        company_groups = session.\
-            query(CompanyTag).\
+        company_group_ids = session.\
+            query(CompanyTag.company_group_id).\
             filter(CompanyTag.tag_group_id ==
                    session.
                    query(Tag.tag_group_id).
@@ -223,11 +225,10 @@ def search():
                           keyword)).\
             all()
 
-        res = []
-        for company_group in company_groups:
-            res.append(company_group.company_group_id)
+    for company_group_id in company_group_ids:
+        companies_list.append(company_group_id)
 
-        response['message'] = res
+    response['message'] = companies_list
 
     json_response = json.dumps(response)
     return json_response
