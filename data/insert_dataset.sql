@@ -1,3 +1,5 @@
+USE company_info;
+
 INSERT INTO language(code) VALUES('en');
 INSERT INTO language(code) VALUES('kr');
 INSERT INTO language(code) VALUES('jp');

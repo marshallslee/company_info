@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `company_info`.`company` (
   PRIMARY KEY (`id`),
   INDEX `fk_company_company_group1_idx` (`company_group_id` ASC),
   INDEX `fk_company_language1_idx` (`language_id` ASC),
+  FULLTEXT INDEX `company_name_idx` (`name`) WITH PARSER NGRAM,
   CONSTRAINT `fk_company_company_group1`
     FOREIGN KEY (`company_group_id`)
     REFERENCES `company_info`.`company_group` (`id`)
@@ -106,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `company_info`.`company_tag` (
   `tag_group_id` INT NOT NULL,
   INDEX `fk_company_tag_tag_group1_idx` (`tag_group_id` ASC),
   INDEX `fk_company_tag_company_group1_idx` (`company_group_id` ASC),
-  PRIMARY KEY (`company_group_id`, `tag_group_id`),
+  PRIMARY KEY (`tag_group_id`, `company_group_id`),
   CONSTRAINT `fk_company_tag_company_group1`
     FOREIGN KEY (`company_group_id`)
     REFERENCES `company_info`.`company_group` (`id`)
@@ -123,6 +124,5 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 ````
