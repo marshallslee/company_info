@@ -53,7 +53,7 @@ class TagGroupModel(Base):
 
         try:
             tag_group = session.query(TagGroupModel).filter(TagGroupModel.name == tag_group_name).one()
-            session.add(tag_group)
+            session.delete(tag_group)
             session.commit()
 
         except (

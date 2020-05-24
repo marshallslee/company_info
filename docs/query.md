@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS `company_info`.`company` (
   INDEX `fk_company_company_group1_idx` (`company_group_id` ASC),
   INDEX `fk_company_language1_idx` (`language_id` ASC),
   FULLTEXT INDEX `company_name_idx` (`name`) WITH PARSER NGRAM,
+  UNIQUE INDEX `company_idx` (`company_group_id` ASC, `language_id` ASC),
   CONSTRAINT `fk_company_company_group1`
     FOREIGN KEY (`company_group_id`)
     REFERENCES `company_info`.`company_group` (`id`)
@@ -58,8 +59,8 @@ CREATE TABLE IF NOT EXISTS `company_info`.`company` (
   CONSTRAINT `fk_company_language1`
     FOREIGN KEY (`language_id`)
     REFERENCES `company_info`.`language` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -86,11 +87,13 @@ CREATE TABLE IF NOT EXISTS `company_info`.`tag` (
   PRIMARY KEY (`id`),
   INDEX `fk_tag_language_idx` (`language_id` ASC),
   INDEX `fk_tag_tag_group1_idx` (`tag_group_id` ASC),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC),
+  UNIQUE INDEX `tag_idx` (`language_id` ASC, `tag_group_id` ASC),
   CONSTRAINT `fk_tag_language`
     FOREIGN KEY (`language_id`)
     REFERENCES `company_info`.`language` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT `fk_tag_tag_group1`
     FOREIGN KEY (`tag_group_id`)
     REFERENCES `company_info`.`tag_group` (`id`)
@@ -111,13 +114,13 @@ CREATE TABLE IF NOT EXISTS `company_info`.`company_tag` (
   CONSTRAINT `fk_company_tag_company_group1`
     FOREIGN KEY (`company_group_id`)
     REFERENCES `company_info`.`company_group` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT `fk_company_tag_tag_group1`
     FOREIGN KEY (`tag_group_id`)
     REFERENCES `company_info`.`tag_group` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
