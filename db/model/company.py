@@ -25,8 +25,18 @@ class CompanyModel(Base):
     def insert(company_name, company_group_name, language_code):
         success = True
         error_msg = None
+
         company_group_id = CompanyGroupModel.select_company_group_id_by_company_group_name(company_group_name)
+        if not company_group_id:
+            success = False
+            error_msg = "No record found for the company group name: {}".format(company_group_name)
+            return success, error_msg
+
         language_id = LanguageModel.select_language_id_by_code(language_code)
+        if not language_id:
+            success = False
+            error_msg = "No record found for the language code: {}".format(language_code)
+            return success, error_msg
 
         company = CompanyModel(name=company_name, company_group_id=company_group_id, language_id=language_id)
         try:
@@ -67,8 +77,18 @@ class CompanyModel(Base):
     def delete(company_name, company_group_name, language_code):
         success = True
         error_msg = None
+
         company_group_id = CompanyGroupModel.select_company_group_id_by_company_group_name(company_group_name)
+        if not company_group_id:
+            success = False
+            error_msg = "No record found for the company group name: {}".format(company_group_name)
+            return success, error_msg
+
         language_id = LanguageModel.select_language_id_by_code(language_code)
+        if not language_id:
+            success = False
+            error_msg = "No record found for the language code: {}".format(language_code)
+            return success, error_msg
 
         try:
             tag = session.\
