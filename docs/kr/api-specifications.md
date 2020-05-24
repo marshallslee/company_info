@@ -202,21 +202,24 @@ GET /search?query_type=company&keyword=株式会社
 ```
 200 OK
 
-{
-    "result": [
-        {
-            "company_name": "ABC 주식회사",
-            "tags": [
-                "스타트업",
-                "100명 이상 직원",
-                "강남"
-            ]
+[
+    {
+        "company_group_id": 1,
+        "company_name": {
+            "kr": "ABC 주식회사",
+            "en": "ABC LLC"
         },
-        ...
-    ]
-}
+    },
+    {
+        "company_group_id: 2,
+        "company_name": {
+            "kr": "ABC 상사",
+            "en": "ABC Trading Co., Ltd."
+        },
+    },    
+    ...
+]
 ```
-
 
 검색 및 결과 리턴 순서도는 각각 다음 참조.
 * [회사명 검색](../../images/flowcharts/search_by_company.png)

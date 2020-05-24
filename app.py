@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from config.config import DB_URI
 from db.model import Language, CompanyGroup, TagGroup, CompanyTag, Company, Tag
+from collections import defaultdict
 
 
 app = Flask(__name__)
@@ -196,16 +197,14 @@ def add_new_company():
         return json_response
 
 
+# 회사 검색 결과를 리턴해주는 함수.
 @app.route('/search', methods=['GET'])
 def search():
-    companies_list = []
     company_group_ids = []
-    response = {}
-
     query_type = request.args.get('query_type')
     keyword = request.args.get('keyword')
 
-    # 회사명으로 검색시
+    # 회사명으로 회사 검색시
     if query_type == 'company':
         company_group_ids = session.\
             query(Company.company_group_id).\
@@ -214,7 +213,7 @@ def search():
             distinct().\
             all()
 
-    # 태그명으로 검색시
+    # 태그명으로 회사 검색시
     elif query_type == 'tag':
         company_group_ids = session.\
             query(CompanyTag.company_group_id).\
@@ -225,12 +224,25 @@ def search():
                           keyword)).\
             all()
 
+    company_group_ids = [r for r, in company_group_ids]
+
+    # JSON array 결과값을 담기 위한 res_list 변수 선언
+    res_list = []
     for company_group_id in company_group_ids:
-        companies_list.append(company_group_id)
+        companies = session.query(Company).filter(Company.company_group_id == company_group_id).all()
 
-    response['message'] = companies_list
+        company_lang_name_mapper = {}
+        for company in companies:
+            language_code = session.query(Language.code).filter(Language.id == company.language_id).one()[0]
+            company_lang_name_mapper[language_code] = company.name
 
-    json_response = json.dumps(response)
+        company_info = {
+            'company_group_id': company_group_id,
+            'company_name': company_lang_name_mapper
+        }
+        res_list.append(company_info)
+
+    json_response = json.dumps(res_list)
     return json_response
 
 
