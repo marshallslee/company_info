@@ -1,7 +1,7 @@
 # API Specifications
 
 #### 1. `/language`
-`POST` 메소드. 언어 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
+##### 1) `POST` 메소드. 언어 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
 ```
 code: 언어 코드를 말함. 영어의 경우 en, 한국어는 kr, 일본어는 jp, 중국어는 cn 등이다.
 
@@ -31,8 +31,30 @@ HTTP 400
 }
 ```
 
+##### 2) `DELETE` 메소드. 언어 데이터를 삭제하는 기능이며 요청 바디는 다음과 같다.
+```
+code: 언어 코드를 말함. 영어의 경우 en, 한국어는 kr, 일본어는 jp, 중국어는 cn 등이다.
+
+{
+  "code": "en"
+}
+```
+
+커맨드라인으로는 다음과 같이 호출 가능하다.
+```
+$curl -X DELETE localhost:5000/language --header "Content-Type: application/json" --data '{"code": "en"}'
+```
+
+성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
+```
+HTTP 200
+{
+  "message": "OK"
+}
+```
+
 #### 2. `/company-group`
-`POST` 메소드. 회사 그룹 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
+##### 1) `POST` 메소드. 회사 그룹 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
 ```
 name: 회사 그룹명.
 
@@ -51,7 +73,7 @@ $curl -X POST localhost:5000/company-group --header "Content-Type: application/j
 HTTP 200
 
 {
-  "message": ""
+  "message": "OK"
 }
 ```
 
@@ -64,7 +86,32 @@ HTTP 400
 }
 ```
 
+##### 2) `DELETE` 메소드. 회사 그룹 데이터를 삭제하며 요청 바디는 다음과 같이 구성된다.
+```
+name: 회사 그룹명.
+
+{
+  "name": "좋은 회사"
+}
+```
+
+커맨드라인으로는 다음과 같이 호출 가능하다.
+```
+$curl -X DELETE localhost:5000/company-group --header "Content-Type: application/json" --data '{"name": "원티드랩"}'
+```
+
+성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
+```
+HTTP 200
+
+{
+  "message": ""
+}
+```
+
 #### 3. `/company-group/tag-group`
+회사 그룹에 대한 태그 그룹을 관리하는 API. 
+
 ##### 1) `POST` 메소드. 회사 그룹에 태그 그룹을 추가한다. 요청 바디는 다음과 같이 구성된다.
 ```
 company_group_name: 회사 그룹명.
@@ -76,10 +123,17 @@ tag_group_name: 태그 그룹명.
 }
 ```
 
+curl 요청 예제는 다음과 같다.
+```
+$curl -X POST localhost:5000/company-group/tag-group --header "Content-Type: application/json" --data '{"company_group_name": "원티드랩", "tag_group_name": "TAG 1"}'
+```
+
 이후에 값을 처리하는 로직에 대해서는 [다음 이미지](../../images/flowcharts/add_tag_group_to_company_group.png) 참고.
 
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
-```json
+```
+HTTP 200
+
 {
   "message": "OK"
 }
@@ -94,7 +148,21 @@ HTTP 400
 }
 ```
 
-##### 2) `DELETE` 메소드. 회사 그룹에서 태그 그룹을 삭제해 준다.
+##### 2) `DELETE` 메소드. 회사 그룹에서 태그 그룹을 삭제해 준다. 요청 바디는 다음과 같이 구성된다.
+```
+company_group_name: 회사 그룹명.
+tag_group_name: 태그 그룹명.
+
+{
+  "company_group_name": "ABC 상사",
+  "tag_group_name": "태그"
+}
+```
+
+curl 요청 예제는 다음과 같다.
+```
+$curl -X DELETE localhost:5000/company-group/tag-group --header "Content-Type: application/json" --data '{"company_group_name": "원티드랩", "tag_group_name": "TAG 1"}'
+```
 
 #### 4. `/tag-group`
 `POST` 메소드. 태그 그룹 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
@@ -125,12 +193,12 @@ HTTP 400
 #### 5. `/tag`
 ##### 1) `POST` 메소드. 태그 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
 ```
-name: 태그 그룹명.
+tag_name: 태그 그룹명.
 language_code: 언어 코드
-tag_group_id: 태그 그룹명
+tag_group_name: 태그 그룹명
 
 {
-  "name": "startup",
+  "tag_name": "startup",
   "language_code": "en",
   "tag_group_name": "startup"
 }
@@ -208,14 +276,14 @@ GET /search?query_type=company&keyword=株式会社
         "company_name": {
             "kr": "ABC 주식회사",
             "en": "ABC LLC"
-        },
+        }
     },
     {
         "company_group_id: 2,
         "company_name": {
             "kr": "ABC 상사",
             "en": "ABC Trading Co., Ltd."
-        },
+        }
     },    
     ...
 ]
