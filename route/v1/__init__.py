@@ -201,11 +201,11 @@ def search():
 
     # 회사명으로 회사 검색시
     if query_type == 'company':
-        company_group_ids = CompanyModel.select_company_group_ids_by_company_name(keyword, int(limit), int(page))
+        company_group_ids = CompanyModel.select_company_group_ids_by_company_name(keyword, limit, page)
 
     # 태그명으로 회사 검색시
     elif query_type == 'tag':
-        company_group_ids = CompanyTagModel.select_company_group_ids_by_tag(keyword, int(limit), int(page))
+        company_group_ids = CompanyTagModel.select_company_group_ids_by_tag(keyword, limit, page)
 
     if not company_group_ids:
         response = {
