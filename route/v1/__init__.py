@@ -231,5 +231,4 @@ def search():
         }
         res_list.append(company_info)
 
-    json_response = json.dumps(res_list)
-    return json_response
+    return make_response(jsonify(res_list), HTTPStatus.OK)
