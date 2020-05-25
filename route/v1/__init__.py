@@ -190,6 +190,15 @@ def search():
     limit = request.args.get('limit')
     page = request.args.get('page')
 
+    try:
+        limit = int(limit)
+        page = int(page)
+    except ValueError:
+        response = {
+            'message': 'Wrong page input: limit: {}, page: {}'.format(limit, page)
+        }
+        return make_response(jsonify(response), HTTPStatus.BAD_REQUEST)
+
     # 회사명으로 회사 검색시
     if query_type == 'company':
         company_group_ids = CompanyModel.select_company_group_ids_by_company_name(keyword, int(limit), int(page))
