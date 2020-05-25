@@ -58,13 +58,20 @@ class CompanyModel(Base):
         return success, error_msg
 
     @staticmethod
-    def select_company_group_ids_by_company_name(company_name):
-        return session. \
-            query(CompanyModel.company_group_id). \
-            filter(CompanyModel.name.
-                   match(company_name)). \
-            distinct(). \
-            all()
+    def select_company_group_ids_by_company_name(company_name, limit, page):
+        # limit: 페이지당 노출되는 개시물의 갯수
+        # offset: 몇 번 인덱스 레코드부터 보여질 것인지 결정하는 파라미터.
+        offset = limit * (page - 1)
+        company_group_ids = []
+        for company_group_id in session.\
+                query(CompanyModel.company_group_id).\
+                filter(CompanyModel.name.match(company_name)).\
+                offset(offset).\
+                limit(limit).\
+                distinct().\
+                all():
+            company_group_ids.append(company_group_id)
+        return company_group_ids
 
     @staticmethod
     def select_company_by_company_group_id(company_group_id):

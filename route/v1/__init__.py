@@ -187,14 +187,16 @@ def search():
     company_group_ids = []
     query_type = request.args.get('query_type')
     keyword = request.args.get('keyword')
+    limit = request.args.get('limit')
+    page = request.args.get('page')
 
     # 회사명으로 회사 검색시
     if query_type == 'company':
-        company_group_ids = CompanyModel.select_company_group_ids_by_company_name(keyword)
+        company_group_ids = CompanyModel.select_company_group_ids_by_company_name(keyword, int(limit), int(page))
 
     # 태그명으로 회사 검색시
     elif query_type == 'tag':
-        company_group_ids = CompanyTagModel.select_company_group_ids_by_tag(keyword)
+        company_group_ids = CompanyTagModel.select_company_group_ids_by_tag(keyword, int(limit), int(page))
 
     company_group_ids = [r for r, in company_group_ids]
 
