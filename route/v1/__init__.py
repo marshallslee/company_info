@@ -1,4 +1,4 @@
-from flask import request, json, jsonify, Blueprint, make_response
+from flask import request, jsonify, Blueprint, make_response
 from db.model.company import CompanyModel
 from db.model.companygroup import CompanyGroupModel
 from db.model.tag import TagModel
@@ -6,6 +6,10 @@ from db.model.taggroup import TagGroupModel
 from db.model.companytag import CompanyTagModel
 from db.model.language import LanguageModel
 from http import HTTPStatus
+from command.command import CommandInitializer
+from command.input_validity import InputValidityCheckCommand
+from command.company_group import FindCompanyGroupIDsCommand
+from command.company import GetCompaniesByCompanyGroupIDCommand
 import logging
 
 app_route = Blueprint('v1', __name__, url_prefix='/v1')
@@ -184,51 +188,12 @@ def manage_companies():
 # 회사 검색 결과를 리턴해주는 함수.
 @app_route.route('/search', methods=['GET'])
 def search():
-    company_group_ids = []
-    query_type = request.args.get('query_type')
-    keyword = request.args.get('keyword')
-    limit = request.args.get('limit')
-    page = request.args.get('page')
+    status, response = CommandInitializer([
+        InputValidityCheckCommand,
+        FindCompanyGroupIDsCommand,
+        GetCompaniesByCompanyGroupIDCommand
+    ]).execute(
+        data={'payload': request.args}
+    )
 
-    try:
-        limit = int(limit)
-        page = int(page)
-    except ValueError:
-        response = {
-            'message': 'Wrong page input: limit: {}, page: {}'.format(limit, page)
-        }
-        return make_response(jsonify(response), HTTPStatus.BAD_REQUEST)
-
-    # 회사명으로 회사 검색시
-    if query_type == 'company':
-        company_group_ids = CompanyModel.select_company_group_ids_by_company_name(keyword, limit, page)
-
-    # 태그명으로 회사 검색시
-    elif query_type == 'tag':
-        company_group_ids = CompanyTagModel.select_company_group_ids_by_tag(keyword, limit, page)
-
-    if not company_group_ids:
-        response = {
-            'message': 'out of page'
-        }
-        return make_response(jsonify(response), HTTPStatus.OK)
-
-    # JSON array 결과값을 담기 위한 res_list 변수 선언
-    res_list = []
-    for company_group_id in company_group_ids:
-        companies = CompanyModel.select_company_by_company_group_id(company_group_id)
-
-        # 언어별 회사명을 담을 딕셔너리 변수 선언.
-        company_lang_name_mapper = {}
-
-        for company in companies:
-            language_code = LanguageModel.select_language_code_by_language_id(company.language_id)
-            company_lang_name_mapper[language_code] = company.name
-
-        company_info = {
-            'company_group_id': company_group_id,
-            'company_name': company_lang_name_mapper
-        }
-        res_list.append(company_info)
-
-    return make_response(jsonify(res_list), HTTPStatus.OK)
+    return make_response(jsonify(response), status)

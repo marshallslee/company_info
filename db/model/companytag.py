@@ -57,8 +57,12 @@ class CompanyTagModel(Base):
             filter(CompanyTagModel.tag_group_id == session.query(TagModel.tag_group_id).filter(TagModel.name == tag))
 
         count = query.count()
-        if offset + 1 > count:
+        if count == 0:
+            return 'no result'
+
+        elif offset + 1 > count:
             return None
+
         else:
             query_by_page = query.offset(offset).limit(limit).all()
             for company_group_id in query_by_page:

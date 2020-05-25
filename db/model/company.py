@@ -70,13 +70,18 @@ class CompanyModel(Base):
 
         count = query.count()
 
-        if offset + 1 > count:
+        if count == 0:
+            return 'no result'
+
+        elif offset + 1 > count:
             return None
+
         else:
             query_by_page = query.offset(offset).limit(limit).all()
             for company_group_id in query_by_page:
                 result.append(company_group_id)
             result = [item for item, in result]
+
         return result
 
     @staticmethod
