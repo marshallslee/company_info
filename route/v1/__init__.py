@@ -70,14 +70,14 @@ def manage_tag_groups_for_company_groups():
 
         # POST 메소드 호출시 태그 정보를 회사에 추가.
         if request.method == 'POST':
-            success, err_msg = CompanyTagModel.insert_company_group_id_and_tag_group_id_to_company_tag(company_group_id, tag_group_id)
+            success, err_msg = CompanyTagModel.insert(company_group_id, tag_group_id)
             if success:
                 response['message'] = 'OK'
             else:
                 response['message'] = 'Failure: {}'.format(err_msg)
 
         elif request.method == 'DELETE':
-            success, err_msg = CompanyTagModel.delete_company_group_id_and_tag_group_id_from_company_tag(company_group_id, tag_group_id)
+            success, err_msg = CompanyTagModel.delete(company_group_id, tag_group_id)
             if success:
                 response['message'] = 'OK'
             else:
@@ -198,7 +198,11 @@ def search():
     elif query_type == 'tag':
         company_group_ids = CompanyTagModel.select_company_group_ids_by_tag(keyword, int(limit), int(page))
 
-    company_group_ids = [r for r, in company_group_ids]
+    if not company_group_ids:
+        response = {
+            'message': 'out of page'
+        }
+        return make_response(jsonify(response), HTTPStatus.OK)
 
     # JSON array 결과값을 담기 위한 res_list 변수 선언
     res_list = []

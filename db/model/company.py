@@ -62,16 +62,22 @@ class CompanyModel(Base):
         # limit: 페이지당 노출되는 개시물의 갯수
         # offset: 몇 번 인덱스 레코드부터 보여질 것인지 결정하는 파라미터.
         offset = limit * (page - 1)
-        company_group_ids = []
-        for company_group_id in session.\
-                query(CompanyModel.company_group_id).\
-                filter(CompanyModel.name.match(company_name)).\
-                offset(offset).\
-                limit(limit).\
-                distinct().\
-                all():
-            company_group_ids.append(company_group_id)
-        return company_group_ids
+        result = []
+        query = session.\
+            query(CompanyModel.company_group_id).\
+            filter(CompanyModel.name.match(company_name)).\
+            distinct()
+
+        count = query.count()
+
+        if offset + 1 > count:
+            return None
+        else:
+            query_by_page = query.offset(offset).limit(limit).all()
+            for company_group_id in query_by_page:
+                result.append(company_group_id)
+            result = [item for item, in result]
+        return result
 
     @staticmethod
     def select_company_by_company_group_id(company_group_id):

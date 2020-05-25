@@ -23,7 +23,7 @@ class CompanyTagModel(Base):
         self.tag_group_id = tag_group_id
 
     @staticmethod
-    def insert_company_group_id_and_tag_group_id_to_company_tag(company_group_id, tag_group_id):
+    def insert(company_group_id, tag_group_id):
         success = True
         error_msg = None
 
@@ -51,19 +51,23 @@ class CompanyTagModel(Base):
         # limit: 페이지당 노출되는 개시물의 갯수
         # offset: 몇 번 인덱스 레코드부터 보여질 것인지 결정하는 파라미터.
         offset = limit * (page - 1)
-        company_group_ids = []
-        for company_group_id in session.\
-                query(CompanyTagModel.company_group_id).\
-                filter(CompanyTagModel.tag_group_id == session.query(TagModel.tag_group_id).filter(TagModel.name == tag)).\
-                offset(offset).\
-                limit(limit).\
-                all():
+        result = []
+        query = session.\
+            query(CompanyTagModel.company_group_id).\
+            filter(CompanyTagModel.tag_group_id == session.query(TagModel.tag_group_id).filter(TagModel.name == tag))
 
-            company_group_ids.append(company_group_id)
-        return company_group_ids
+        count = query.count()
+        if offset + 1 > count:
+            return None
+        else:
+            query_by_page = query.offset(offset).limit(limit).all()
+            for company_group_id in query_by_page:
+                result.append(company_group_id)
+            result = [item for item, in result]
+        return result
 
     @staticmethod
-    def delete_company_group_id_and_tag_group_id_from_company_tag(company_group_id, tag_group_id):
+    def delete(company_group_id, tag_group_id):
         success = True
         error_msg = None
 

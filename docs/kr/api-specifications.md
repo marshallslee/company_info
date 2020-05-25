@@ -256,14 +256,16 @@ HTTP 400
 `GET` 메소드. 뒤에 붙는 파라미터 목록은 다음과 같다.
 * `query_type`: 검색 타입. 회사명 검색인지 혹은 태그 기반 검색인지 정하는 부분.
 * `keyword`: 검색어
+* `limit`: 한 페이지당 보여질 목록의 수
+* `page`: 몇번째 페이지를 보고 싶은가?
 
 요청 예시는 다음과 같다.
 ```
 1. 태그 검색
-GET /search?query_type=tag&keyword=tag_1
+GET /search?query_type=tag&keyword=tag_1&limit=3&page=1
 
 2. 회사명 검색
-GET /search?query_type=company&keyword=株式会社
+GET /search?query_type=company&keyword=株式会社&limit=4&page=2
 ```
 
 정상적인 요청이 이루어지면 다음과 같이 리턴한다.
