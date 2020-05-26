@@ -7,9 +7,7 @@ from db.model.companytag import CompanyTagModel
 from db.model.language import LanguageModel
 from http import HTTPStatus
 from command.command import CommandInitializer
-from command.input_validity import InputValidityCheckCommand
 from command.company_group import FindCompanyGroupIDsCommand
-from command.company import GetCompaniesByCompanyGroupIDCommand
 import logging
 
 app_route = Blueprint('v1', __name__, url_prefix='/v1')
@@ -189,9 +187,7 @@ def manage_companies():
 @app_route.route('/search', methods=['GET'])
 def search():
     status, response = CommandInitializer([
-        InputValidityCheckCommand,
-        FindCompanyGroupIDsCommand,
-        GetCompaniesByCompanyGroupIDCommand
+        FindCompanyGroupIDsCommand
     ]).execute(
         data={'payload': request.args}
     )

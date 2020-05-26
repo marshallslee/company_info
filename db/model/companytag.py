@@ -5,7 +5,6 @@ from mysql import connector
 from sqlalchemy.exc import SQLAlchemyError
 from db.model.companygroup import CompanyGroupModel
 from db.model.taggroup import TagGroupModel
-from db.model.tag import TagModel
 
 Base = declarative_base()
 
@@ -45,30 +44,6 @@ class CompanyTagModel(Base):
             session.close()
 
         return success, error_msg
-
-    @staticmethod
-    def select_company_group_ids_by_tag(tag, limit, page):
-        # limit: 페이지당 노출되는 개시물의 갯수
-        # offset: 몇 번 인덱스 레코드부터 보여질 것인지 결정하는 파라미터.
-        offset = limit * (page - 1)
-        result = []
-        query = session.\
-            query(CompanyTagModel.company_group_id).\
-            filter(CompanyTagModel.tag_group_id == session.query(TagModel.tag_group_id).filter(TagModel.name == tag))
-
-        count = query.count()
-        if count == 0:
-            return 'no result'
-
-        elif offset + 1 > count:
-            return None
-
-        else:
-            query_by_page = query.offset(offset).limit(limit).all()
-            for company_group_id in query_by_page:
-                result.append(company_group_id)
-            result = [item for item, in result]
-        return result
 
     @staticmethod
     def delete(company_group_id, tag_group_id):

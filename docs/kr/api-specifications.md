@@ -210,7 +210,7 @@ $curl -X DELETE localhost:5000/company-group/tag-group --header "Content-Type: a
 {
   "name": "startup",
   "company_group_name": "",
-  "language_code": "en",
+  "language_code": "en"
 }
 ```
 
@@ -232,38 +232,35 @@ $curl -X DELETE localhost:5000/company-group/tag-group --header "Content-Type: a
 `GET` 메소드. 뒤에 붙는 파라미터 목록은 다음과 같다.
 * `query_type`: 검색 타입. 회사명 검색인지 혹은 태그 기반 검색인지 정하는 부분.
 * `keyword`: 검색어
-* `limit`: 한 페이지당 보여질 목록의 수
-* `page`: 몇번째 페이지를 보고 싶은가?
 
 요청 예시는 다음과 같다.
 ```
 1. 태그 검색
-GET /search?query_type=tag&keyword=tag_1&limit=3&page=1
+GET /search?query_type=tag&keyword=tag_1
 
 2. 회사명 검색
-GET /search?query_type=company&keyword=株式会社&limit=4&page=2
+GET /search?query_type=company&keyword=株式会社
 ```
 
 정상적인 요청이 이루어지면 다음과 같이 리턴한다.
 ```json
-[
-    {
-        "company_group_id": 1,
-        "company_name": {
-            "kr": "ABC 주식회사",
-            "en": "ABC LLC"
+{
+  "companies_list": 
+    [
+        {
+            "company_group_id": 1,
+            "company_name": {
+                "kr": "ABC 주식회사",
+                "en": "ABC LLC"
+            }
+        },
+        {
+            "company_group_id": 2,
+            "company_name": {
+                "kr": "ABC 상사",
+                "en": "ABC Trading Co., Ltd."
+            }
         }
-    },
-    {
-        "company_group_id": 2,
-        "company_name": {
-            "kr": "ABC 상사",
-            "en": "ABC Trading Co., Ltd."
-        }
-    }
-]
+    ]
+}
 ```
-
-검색 및 결과 리턴 순서도는 각각 다음 참조.
-* [회사명 검색](../../images/flowcharts/search_by_company.png)
-* [태그 검색](../../images/flowcharts/search_by_tag.png)

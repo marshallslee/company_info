@@ -6,6 +6,10 @@ app = Flask(__name__)
 
 # UTF-8 서포트
 app.config['JSON_AS_ASCII'] = False
+
+# Pretty print JSON
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+
 register_route(app)
 init_logging_config()
 

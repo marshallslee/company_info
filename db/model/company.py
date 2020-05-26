@@ -3,8 +3,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from db import session
 from mysql import connector
 from sqlalchemy.exc import SQLAlchemyError
+from db.model.tag import TagModel
+from db.model.companytag import CompanyTagModel
 from db.model.companygroup import CompanyGroupModel
 from db.model.language import LanguageModel
+from collections import defaultdict
 
 Base = declarative_base()
 
@@ -58,30 +61,46 @@ class CompanyModel(Base):
         return success, error_msg
 
     @staticmethod
-    def select_company_group_ids_by_company_name(company_name, limit, page):
-        # limit: 페이지당 노출되는 개시물의 갯수
-        # offset: 몇 번 인덱스 레코드부터 보여질 것인지 결정하는 파라미터.
-        offset = limit * (page - 1)
-        result = []
-        query = session.\
-            query(CompanyModel.company_group_id).\
-            filter(CompanyModel.name.match(company_name)).\
-            distinct()
+    def select_companies_by_tag(tag):
+        subquery = session.query(TagModel.tag_group_id).filter(TagModel.name == tag).subquery()
+        query = session. \
+            query(CompanyGroupModel.id, LanguageModel.code, CompanyModel.name). \
+            join(CompanyGroupModel, CompanyModel.company_group_id == CompanyGroupModel.id). \
+            join(LanguageModel, CompanyModel.language_id == LanguageModel.id). \
+            join(CompanyTagModel, CompanyGroupModel.id == CompanyTagModel.company_group_id). \
+            join(subquery, CompanyTagModel.tag_group_id == subquery.c.tag_group_id)
 
-        count = query.count()
+        query_by_page = query.order_by(
+            CompanyModel.company_group_id.asc(), CompanyModel.name.asc()
+        ).all()
 
-        if count == 0:
-            return 'no result'
+        res = defaultdict(list)
+        for x in query_by_page:
+            res[x[0]].append(x[1:])
 
-        elif offset + 1 > count:
-            return None
+        result = {'companies_list': [{'company_group_id': x, 'name': dict(res[x])} for x in res]}
 
-        else:
-            query_by_page = query.offset(offset).limit(limit).all()
-            for company_group_id in query_by_page:
-                result.append(company_group_id)
-            result = [item for item, in result]
+        return result
 
+    @staticmethod
+    def select_companies_by_name(company_name):
+        subquery = session.query(CompanyModel.company_group_id).filter(CompanyModel.name.match(company_name)).\
+            distinct().subquery()
+
+        query_result = session. \
+            query(CompanyGroupModel.id, LanguageModel.code, CompanyModel.name). \
+            join(CompanyGroupModel, CompanyModel.company_group_id == CompanyGroupModel.id). \
+            join(LanguageModel, CompanyModel.language_id == LanguageModel.id). \
+            join(subquery, CompanyGroupModel.id == subquery.c.company_group_id).\
+            order_by(
+                CompanyModel.company_group_id.asc(), CompanyModel.name.asc()
+            ).all()
+
+        res = defaultdict(list)
+        for x in query_result:
+            res[x[0]].append(x[1:])
+
+        result = {'companies_list': [{'company_group_id': x, 'name': dict(res[x])} for x in res]}
         return result
 
     @staticmethod
@@ -109,11 +128,11 @@ class CompanyModel(Base):
             return success, error_msg
 
         try:
-            tag = session.\
-                query(CompanyModel).\
+            tag = session. \
+                query(CompanyModel). \
                 filter(CompanyModel.name == company_name,
                        CompanyModel.company_group_id == company_group_id,
-                       CompanyModel.language_id == language_id).\
+                       CompanyModel.language_id == language_id). \
                 one()
             session.delete(tag)
             session.commit()

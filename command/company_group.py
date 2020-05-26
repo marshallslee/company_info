@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from .command import Command
-from db.model.companytag import CompanyTagModel
 from db.model.company import CompanyModel
 import logging
 
@@ -20,20 +19,16 @@ class FindCompanyGroupIDsCommand(Command):
 
         query_type = payload['query_type']
         keyword = payload['keyword']
-        limit = payload['limit']
-        page = payload['page']
 
         query_result = None
-        limit = int(limit)
-        page = int(page)
 
         # 회사명으로 회사 검색시
         if query_type == 'company':
-            query_result = CompanyModel.select_company_group_ids_by_company_name(keyword, limit, page)
+            query_result = CompanyModel.select_companies_by_name(keyword)
 
         # 태그명으로 회사 검색시
         elif query_type == 'tag':
-            query_result = CompanyTagModel.select_company_group_ids_by_tag(keyword, limit, page)
+            query_result = CompanyModel.select_companies_by_tag(keyword)
 
         if query_result == 'no result':
             response['message'] = 'no result'
@@ -43,5 +38,5 @@ class FindCompanyGroupIDsCommand(Command):
             response['message'] = 'out of page'
             return HTTPStatus.OK, response
 
-        data['company_group_ids'] = query_result
+        response = query_result
         return self.command.execute(**kwargs) if self.command else (HTTPStatus.OK, response)
