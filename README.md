@@ -42,3 +42,18 @@ $FLASK_ENV=local python -m flask run
 ## [3. DB Modeling](docs/kr/db-modeling.md)
 
 ## [4. API Specifications](docs/kr/api-specifications.md)
+
+## 5. Unit Testing
+
+다음과 같이 유닛 테스팅을 실행해 볼 수 있다.
+
+```
+$FLASK_ENV=local python -m unittest test/test_config.py
+
+(venv) marshallslee@Marshalls-MacBook-Pro company_info % FLASK_ENV=local python -m unittest test/test_config.py
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+```
