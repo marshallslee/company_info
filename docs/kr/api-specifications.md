@@ -1,7 +1,7 @@
 # API Specifications
-현 단계에서는 전체 요청에 대해 일괄적으로 200 응답만을 내보내도록 설계하였다.
+현 단계에서는 전체 요청에 대해 일괄적으로 200 응답만을 내보내도록 설계하였다. 
 
-#### 1. `/language`
+#### 1. `/v1/language`
 ##### 1) `POST` 메소드. 언어 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
 * code: 언어 코드를 말함. 영어의 경우 en, 한국어는 kr, 일본어는 jp, 중국어는 cn 등이다.
 ```json
@@ -12,7 +12,7 @@
 
 커맨드라인으로는 다음과 같이 호출 가능하다.
 ```
-$curl -X POST localhost:5000/language --header "Content-Type: application/json" --data '{"code": "en"}'
+$curl -X POST localhost:5000/v1/language --header "Content-Type: application/json" --data '{"code": "en"}'
 ```
 
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
@@ -40,7 +40,7 @@ $curl -X POST localhost:5000/language --header "Content-Type: application/json" 
 
 커맨드라인으로는 다음과 같이 호출 가능하다.
 ```
-$curl -X DELETE localhost:5000/language --header "Content-Type: application/json" --data '{"code": "en"}'
+$curl -X DELETE localhost:5000/v1/language --header "Content-Type: application/json" --data '{"code": "en"}'
 ```
 
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
@@ -50,7 +50,7 @@ $curl -X DELETE localhost:5000/language --header "Content-Type: application/json
 }
 ```
 
-#### 2. `/company-group`
+#### 2. `/v1/company-group`
 ##### 1) `POST` 메소드. 회사 그룹 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
 * name: 회사 그룹명.
 
@@ -62,7 +62,7 @@ $curl -X DELETE localhost:5000/language --header "Content-Type: application/json
 
 커맨드라인으로는 다음과 같이 호출 가능하다.
 ```
-$curl -X POST localhost:5000/company-group --header "Content-Type: application/json" --data '{"name": "원티드랩"}'
+$curl -X POST localhost:5000/v1/company-group --header "Content-Type: application/json" --data '{"name": "원티드랩"}'
 ```
 
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
@@ -89,7 +89,7 @@ $curl -X POST localhost:5000/company-group --header "Content-Type: application/j
 
 커맨드라인으로는 다음과 같이 호출 가능하다.
 ```
-$curl -X DELETE localhost:5000/company-group --header "Content-Type: application/json" --data '{"name": "원티드랩"}'
+$curl -X DELETE localhost:5000/v1/company-group --header "Content-Type: application/json" --data '{"name": "원티드랩"}'
 ```
 
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
@@ -99,7 +99,7 @@ $curl -X DELETE localhost:5000/company-group --header "Content-Type: application
 }
 ```
 
-#### 3. `/company-group/tag-group`
+#### 3. `/v1/company-group/tag-group`
 회사 그룹에 대한 태그 그룹을 관리하는 API. 
 
 ##### 1) `POST` 메소드. 회사 그룹에 태그 그룹을 추가한다. 요청 바디는 다음과 같이 구성된다.
@@ -114,10 +114,8 @@ $curl -X DELETE localhost:5000/company-group --header "Content-Type: application
 
 curl 요청 예제는 다음과 같다.
 ```
-$curl -X POST localhost:5000/company-group/tag-group --header "Content-Type: application/json" --data '{"company_group_name": "원티드랩", "tag_group_name": "TAG 1"}'
+$curl -X POST localhost:5000/v1/company-group/tag-group --header "Content-Type: application/json" --data '{"company_group_name": "원티드랩", "tag_group_name": "TAG 1"}'
 ```
-
-이후에 값을 처리하는 로직에 대해서는 [다음 이미지](../../images/flowcharts/add_tag_group_to_company_group.png) 참고.
 
 성공적으로 추가 작업이 이루어지는 경우 다음과 같이 응답을 돌려받는다.
 ```json
@@ -146,10 +144,10 @@ $curl -X POST localhost:5000/company-group/tag-group --header "Content-Type: app
 
 curl 요청 예제는 다음과 같다.
 ```
-$curl -X DELETE localhost:5000/company-group/tag-group --header "Content-Type: application/json" --data '{"company_group_name": "원티드랩", "tag_group_name": "TAG 1"}'
+$curl -X DELETE localhost:5000/v1/company-group/tag-group --header "Content-Type: application/json" --data '{"company_group_name": "원티드랩", "tag_group_name": "TAG 1"}'
 ```
 
-#### 4. `/tag-group`
+#### 4. `/v1/tag-group`
 ##### 1) `POST` 메소드. 태그 그룹 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
 * name: 태그 그룹명.
 ```json
@@ -193,7 +191,7 @@ $curl -X DELETE localhost:5000/v1/tag-group --header "Content-Type: application/
 }
 ```
 
-#### 5. `/tag`
+#### 5. `/v1/tag`
 ##### 1) `POST` 메소드. 태그 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
 * tag_name: 태그 그룹명.
 * language_code: 언어 코드
@@ -241,7 +239,7 @@ $curl -X DELETE localhost:5000/v1/tag-group --header "Content-Type: application/
 }
 ```
 
-#### 6. `/company`
+#### 6. `/v1/company`
 ##### 1) `POST` 메소드. 회사 추가. 요청 바디는 다음과 같다.
 * name: 회사명.
 * company_group_id: 회사 그룹
@@ -289,7 +287,7 @@ $curl -X DELETE localhost:5000/v1/tag-group --header "Content-Type: application/
 }
 ```
 
-#### 7. `/search`
+#### 7. `/v1/search`
 `GET` 메소드. 뒤에 붙는 파라미터 목록은 다음과 같다.
 * `query_type`: 검색 타입. 회사명 검색인지 혹은 태그 기반 검색인지 정하는 부분.
 * `keyword`: 검색어
@@ -297,10 +295,10 @@ $curl -X DELETE localhost:5000/v1/tag-group --header "Content-Type: application/
 요청 예시는 다음과 같다.
 ```
 1. 태그 검색
-GET /search?query_type=tag&keyword=tag_1
+GET /v1/search?query_type=tag&keyword=tag_1
 
 2. 회사명 검색
-GET /search?query_type=company&keyword=株式会社
+GET /v1/search?query_type=company&keyword=株式会社
 ```
 
 정상적인 요청이 이루어지면 다음과 같이 리턴한다.
