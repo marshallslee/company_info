@@ -25,9 +25,9 @@ $source venv/bin/activate
 $pip install -r requirements.txt
 ```
 
-###### 4) 애플리케이션 실행
+###### 4) 애플리케이션 실행. 환경변수를 지정해 주어야 한다.
 ```
-$python -m flask run
+$FLASK_ENV=local python -m flask run
 ```
 
 ## 2. Basic Rules
