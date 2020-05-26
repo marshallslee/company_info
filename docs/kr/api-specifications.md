@@ -150,7 +150,7 @@ $curl -X DELETE localhost:5000/company-group/tag-group --header "Content-Type: a
 ```
 
 #### 4. `/tag-group`
-`POST` 메소드. 태그 그룹 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
+##### 1) `POST` 메소드. 태그 그룹 데이터를 추가할 때 호출하며 요청 바디는 다음과 같이 구성된다.
 * name: 태그 그룹명.
 ```json
 {
@@ -169,6 +169,27 @@ $curl -X DELETE localhost:5000/company-group/tag-group --header "Content-Type: a
 ```json
 {
   "message": "Failure: 1062 (23000): Duplicate entry '' for key 'name_UNIQUE'"
+}
+```
+
+##### 2) `DELETE` 메소드. 태그 그룹을 삭제해 준다. 요청 바디는 다음과 같이 구성된다.
+* name: 태그 그룹명.
+
+```json
+{
+  "name": "태그 그룹명"
+}
+```
+
+curl 요청 예제는 다음과 같다.
+```
+$curl -X DELETE localhost:5000/v1/tag-group --header "Content-Type: application/json" --data '{"name": "TAG 29"}' 
+```
+
+실패시 다음과 같이 응답 받는다.
+```json
+{
+  "message": "Failure: None"
 }
 ```
 
@@ -200,6 +221,26 @@ $curl -X DELETE localhost:5000/company-group/tag-group --header "Content-Type: a
 }
 ```
 
+##### 2) `DELETE` 메소드. 태그를 삭제해 준다. 요청 바디는 다음과 같이 구성된다.
+* tag_name: 태그 그룹명.
+* language_code: 언어 코드
+* tag_group_name: 태그 그룹명
+
+```json
+{
+  "tag_name": "startup",
+  "language_code": "en",
+  "tag_group_name": "startup"
+}
+```
+
+실패시 다음과 같이 응답 받는다.
+```
+{
+  "message": "Failure: None"
+}
+```
+
 #### 6. `/company`
 ##### 1) `POST` 메소드. 회사 추가. 요청 바디는 다음과 같다.
 * name: 회사명.
@@ -225,6 +266,26 @@ $curl -X DELETE localhost:5000/company-group/tag-group --header "Content-Type: a
 ```json
 {
   "message": "Failure message"
+}
+```
+
+##### 2) `DELETE` 메소드. 회사를 삭제해 준다. 요청 바디는 다음과 같이 구성된다.
+* name: 회사명.
+* company_group_id: 회사 그룹
+* language_code: 언어 코드 (en, kr, jp, cn, fr 등등)
+
+```json
+{
+  "name": "startup",
+  "company_group_name": "",
+  "language_code": "en"
+}
+```
+
+실패시 다음과 같이 응답 받는다.
+```
+{
+  "message": "Failure: None"
 }
 ```
 
