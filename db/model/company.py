@@ -8,6 +8,7 @@ from db.model.companytag import CompanyTagModel
 from db.model.companygroup import CompanyGroupModel
 from db.model.language import LanguageModel
 from collections import defaultdict
+from db import db_transaction
 
 Base = declarative_base()
 
@@ -51,7 +52,6 @@ class CompanyModel(Base):
                 SQLAlchemyError
         ) as e:
             session.rollback()
-            session.flush()
             success = False
             error_msg = e.__cause__
 
@@ -128,13 +128,13 @@ class CompanyModel(Base):
             return success, error_msg
 
         try:
-            tag = session. \
+            company = session. \
                 query(CompanyModel). \
                 filter(CompanyModel.name == company_name,
                        CompanyModel.company_group_id == company_group_id,
                        CompanyModel.language_id == language_id). \
                 one()
-            session.delete(tag)
+            session.delete(company)
             session.commit()
 
         except (
@@ -142,7 +142,6 @@ class CompanyModel(Base):
                 SQLAlchemyError
         ) as e:
             session.rollback()
-            session.flush()
             success = False
             error_msg = e.__cause__
 

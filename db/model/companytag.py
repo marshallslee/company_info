@@ -36,7 +36,6 @@ class CompanyTagModel(Base):
                 SQLAlchemyError
         ) as e:
             session.rollback()
-            session.flush()
             success = False
             error_msg = e.__cause__
 
@@ -63,7 +62,6 @@ class CompanyTagModel(Base):
                 SQLAlchemyError
         ) as e:
             session.rollback()
-            session.flush()
             success = False
             error_msg = e.__cause__
 
