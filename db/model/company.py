@@ -7,8 +7,7 @@ from db.model.tag import TagModel
 from db.model.companytag import CompanyTagModel
 from db.model.companygroup import CompanyGroupModel
 from db.model.language import LanguageModel
-from collections import defaultdict
-from db import db_transaction
+from util.formatter import format_company_search_result
 
 Base = declarative_base()
 
@@ -70,16 +69,11 @@ class CompanyModel(Base):
             join(CompanyTagModel, CompanyGroupModel.id == CompanyTagModel.company_group_id). \
             join(subquery, CompanyTagModel.tag_group_id == subquery.c.tag_group_id)
 
-        query_by_page = query.order_by(
+        company_query_result = query.order_by(
             CompanyModel.company_group_id.asc(), CompanyModel.name.asc()
         ).all()
 
-        res = defaultdict(list)
-        for x in query_by_page:
-            res[x[0]].append(x[1:])
-
-        result = {'companies_list': [{'company_group_id': x, 'name': dict(res[x])} for x in res]}
-
+        result = format_company_search_result(company_query_result)
         return result
 
     @staticmethod
@@ -96,11 +90,7 @@ class CompanyModel(Base):
                 CompanyModel.company_group_id.asc(), CompanyModel.name.asc()
             ).all()
 
-        res = defaultdict(list)
-        for x in query_result:
-            res[x[0]].append(x[1:])
-
-        result = {'companies_list': [{'company_group_id': x, 'name': dict(res[x])} for x in res]}
+        result = format_company_search_result(query_result)
         return result
 
     @staticmethod
